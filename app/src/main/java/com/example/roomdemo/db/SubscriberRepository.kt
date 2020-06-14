@@ -3,8 +3,8 @@ package com.example.roomdemo.db
 class SubscriberRepository(val dao: SubscriberDAO) {
     val subscriber = dao.getAllSubscriber()
 
-    suspend fun insert(subscriber: Subscriber) {
-        dao.insertSubscriber(subscriber)
+    suspend fun insert(subscriber: Subscriber): Long {
+        return dao.insertSubscriber(subscriber)
     }
 
     suspend fun update(subscriber: Subscriber) {

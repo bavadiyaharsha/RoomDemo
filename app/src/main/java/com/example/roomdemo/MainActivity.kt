@@ -2,6 +2,7 @@ package com.example.roomdemo
 
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
@@ -16,6 +17,8 @@ import com.example.roomdemo.db.SubscriberRepository
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var subscriberViewModel: SubscriberViewModel
+    lateinit var adepter: MyRecycleview
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
@@ -27,18 +30,25 @@ class MainActivity : AppCompatActivity() {
         binding.lifecycleOwner = this
         initRecyclerView()
 
+        subscriberViewModel.msg.observe(this, Observer {
+            it.getContentIfNotHandled()?.let {
+                Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
+            }
+        })
     }
 
     private fun initRecyclerView() {
         binding.subscriberRecyclerView.layoutManager = LinearLayoutManager(this)
+        adepter = MyRecycleview({ selectItem: Subscriber -> listItemClick(selectItem) })
+        binding.subscriberRecyclerView.adapter = adepter
         displaySubscribersList()
     }
 
     fun displaySubscribersList() {
         subscriberViewModel.subscriber.observe(this, Observer {
             Log.i("list", it.toString())
-            binding.subscriberRecyclerView.adapter =
-                MyRecycleview(it, { selectItem: Subscriber -> listItemClick(selectItem) })
+            adepter.setList(it)
+            adepter.notifyDataSetChanged()
         })
     }
 
